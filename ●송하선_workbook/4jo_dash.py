@@ -563,18 +563,18 @@ elif 선택 == "연도별":
             card_box("연간 종별 낙찰금액 추이", fig)
 
  
-#종별 시작
 elif 선택 == "종 별":
     st.subheader("📦 종 별")
     col1, = st.columns(1)
 
     with col1:
         종목록 = ["전체", "1종(식량류)", "2종(일반물자류)", "3종(유류)", "4종(건설자재류)", 
-                "5종(탄약류)", "6종(복지매장 판매품)", "7종(장비류)", "8종(의무 장비/물자류)", "9종(수리부속/공구류)", "10종(기타)"]
+                 "5종(탄약류)", "6종(복지매장 판매품)", "7종(장비류)", "8종(의무 장비/물자류)", "9종(수리부속/공구류)", "10종(기타)"]
         선택종 = st.selectbox("종 분류", 종목록)
 
     if 선택종 != "전체" and "카테고리" in df.columns:
-        filtered_df = filtered_df[filtered_df["카테고리"].astype(str).str[:2] == 선택종]
+        selected_category_num = 선택종.split("종")[0]
+        filtered_df = filtered_df[filtered_df["카테고리"].astype(str).str.startswith(selected_category_num)]
 
     filtered_df["낙찰금액"] = (
         filtered_df["낙찰금액"]
