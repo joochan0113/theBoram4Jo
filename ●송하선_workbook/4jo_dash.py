@@ -457,32 +457,30 @@ elif 선택 == "연도별":
     st.subheader("📅 연도별")
     import datetime
 
-#데이터 타입 변경.. ㅠㅠ
     df['개찰일시'] = pd.to_datetime(df['개찰일시'], errors='coerce')
 
-    date_range = st.date_input(
-        "기간 선택",
-        value=[datetime.date(2016, 1, 1), datetime.date(2024, 12, 31)],
-        min_value=datetime.date(2016, 1, 1),
-        max_value=datetime.date(2025, 12, 31))
+    df['연도'] = df['개찰일시'].dt.year.astype(int)
 
-    if len(date_range) == 2:
-        start_date, end_date = date_range
-        filtered_df = df[
-            (df["개찰일시"].dt.date >= start_date) &
-            (df["개찰일시"].dt.date <= end_date)]
+    선택연도목록 = st.multiselect(
+        "연도 선택",
+        options=sorted(df['연도'].dropna().unique()),
+        default=sorted(df['연도'].dropna().unique())  )
+
+    if 선택연도목록:
+        filtered_df = df[df['연도'].isin(선택연도목록)].copy()
     else:
         filtered_df = df.copy()
+
 
     filtered_df.rename(columns=lambda x: x.strip(), inplace=True)
     filtered_df['연도'] = filtered_df['개찰일시'].dt.year.astype(str)
     filtered_df['낙찰금액'] = (
-    filtered_df['낙찰금액']
-    .astype(str)
-    .str.replace(",", "")
-    .str.replace("원", "")
-    .str.strip()
-    .replace("None", ""))
+        filtered_df['낙찰금액']
+        .astype(str)
+        .str.replace(",", "")
+        .str.replace("원", "")
+        .str.strip()
+        .replace("None", ""))
     filtered_df['낙찰금액'] = pd.to_numeric(filtered_df['낙찰금액'], errors='coerce')
 
     col1, col2, col3 = st.columns([1,1,1])
@@ -492,7 +490,6 @@ elif 선택 == "연도별":
             fig1 = px.line(year_total, x="연도", y="낙찰금액",
                            color_discrete_sequence=px.colors.qualitative.Pastel, markers=True)
             card_box("연도별 낙찰금액", fig1)
-
 
     with col2:
         if not filtered_df.empty and "연도" in filtered_df.columns:
@@ -572,8 +569,8 @@ elif 선택 == "종 별":
     col1, = st.columns(1)
 
     with col1:
-        종목록 = ["전체", "1종", "2종", "3종", "4종", 
-                "5종", "6종", "7종", "8종", "9종", "10종"]
+        종목록 = ["전체", "1종(식량류)", "2종(일반물자류)", "3종(유류)", "4종(건설자재류)", 
+                "5종(탄약류)", "6종(복지매장 판매품)", "7종(장비류)", "8종(의무 장비/물자류)", "9종(수리부속/공구류)", "10종(기타)"]
         선택종 = st.selectbox("종 분류", 종목록)
 
     if 선택종 != "전체" and "카테고리" in df.columns:
