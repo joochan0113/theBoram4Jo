@@ -1,5 +1,20 @@
 # 실행 전 아래 코드 실행해서 설치!
-# pip install pandas streamlit altair numpy folium plotly streamlit-folium
+import subprocess
+import streamlit as st
+
+def install_requirements(requirements_file="requirements.txt"):
+    try:
+        subprocess.check_call(
+            ["pip", "install", "-r", requirements_file]
+        )
+        st.success("requirements.txt에 있는 라이브러리를 모두 설치했습니다 ✅")
+    except subprocess.CalledProcessError as e:
+        st.error(f"라이브러리 설치 실패 ❌: {e}")
+
+# Streamlit 앱 실행 시 버튼 클릭으로 실행
+if st.button("라이브러리 설치하기"):
+    install_requirements("requirements.txt")
+
 
 import pandas as pd
 import streamlit as st
@@ -15,7 +30,7 @@ import time
 import base64
 
 #글꼴.. 
-with open("C:/theBoram4Jo/●송하선_workbook/MaplestoryFont_TTF/Maplestory Light.ttf", "rb") as f:
+with open("data/MaplestoryFont_TTF/Maplestory Light.ttf", "rb") as f:
     font_data = f.read()
 encoded_font = base64.b64encode(font_data).decode()
 
@@ -58,7 +73,7 @@ def get_news_image(url):
         return None
 
 df = pd.read_csv(
-    r"C:/theBoram4Jo/●송하선_workbook/BID_Address.csv",
+    r"data/BID_Address.csv",
     encoding="cp949") 
 # 자기 경로에 맞는 거로 반드시 수정 !
 
@@ -196,7 +211,7 @@ if 선택 == "메인":
                 return None
             return None
 
-        rss_url = "https://news.google.com/rss/search?q=입찰"
+        rss_url = "https://news.google.com/rss/search?q=military+supply+bidding"
         feed = feedparser.parse(rss_url)
 
         if feed.entries:
@@ -528,6 +543,8 @@ elif 선택 == "연도별":
             fig2.update_traces(textinfo='percent+label')
             card_box("연도별 낙찰금액 비율", fig2)  
 
+        cat = ["(식량류)", "(일반물자류)", "(유류)", "(건설자재류)", "(탄약류)", "(복지매장 판매품)", "(장비류)", "(의무 장비/물자류)", "(수리부속/공구류)", "(기타)"]
+
         valid_categories = [f"{i}종" for i in range(1, 11)]
 
         df_expanded = (filtered_df.assign(카테고리=filtered_df["카테고리"].astype(str).str.split(","))
@@ -854,7 +871,7 @@ elif 선택 == "업체별":
  
 
 #여기부터 하단 메뉴
-img_path = r"C:/theBoram4Jo/●송하선_workbook/보람4조.png"
+img_path = r"img/보람4조.png"
 
 def get_base64_image(path):
     with open(path, "rb") as f:
